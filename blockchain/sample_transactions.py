@@ -8,7 +8,7 @@ def post_transaction(sender, receiver, amount, type):
     transaction = sender.create_transaction(receiver.public_key_string(), amount, type)
     url = "http://localhost:8050/api/v1/transaction/create/"
     package = {"transaction": BlockchainUtils.encode(transaction)}
-    response = requests.post(url, json=package)
+    response = requests.post(url, json=package, timeout=15)
     print(response.text)
 
 
