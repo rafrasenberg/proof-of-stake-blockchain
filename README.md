@@ -55,7 +55,7 @@ Run the following command:
 python sample_transactions.py
 ```
 
-This will add 7 transactions, with the current block set to 2 transactions, it will thus create 3 blocks and leave 1 transaction in the transaction pool. Visit `http://localhost:8050/api/v1/blockchain/` to view the blockchain!
+This will add 7 transactions, with the current transaction pool set to 2 transactions per block, it will thus create 3 blocks and leave 1 transaction in the transaction pool. Visit `http://localhost:8050/api/v1/blockchain/` to view the blockchain!
 
 ## Docs
 
