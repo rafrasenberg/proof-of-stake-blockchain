@@ -1,0 +1,10 @@
+name: Main Branch
+
+on: push
+
+jobs:
+  blockchain_unit_tests:
+    name: blockchain
+    uses: rafrasenberg/proof-of-stake-blockchain/.github/workflows/basic_workflow.yml@main
+    with:
+      python_version: '3.11'

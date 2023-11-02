@@ -1,0 +1,5 @@
+cryptography==41.0.5
+p2pnetwork==1.2
+jsonpickle==3.0.2
+uvicorn==0.23.2
+fastapi==0.104.1

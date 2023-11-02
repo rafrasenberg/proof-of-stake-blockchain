@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  node_one:
+    build: ./blockchain
+    command: python run_node.py --ip=0.0.0.0 --node_port=8010 --api_port=8050 --key_file=./keys/genesis_private_key.pem
+    volumes:
+      - ./blockchain:/usr/src/node
+    environment:
+      - USE_DOCKER=True
+      - DOCKER_NODE_CONTAINER_NAMES=node_one,node_two,node_three
+      - DOCKER_NODE_PORTS=8010,8011,8012
+    ports:
+      - 8010:8010
+      - 8050:8050
+    networks:
+      - host
+
+  node_two:
+    build: ./blockchain
+    command: python run_node.py --ip=0.0.0.0 --node_port=8011 --api_port=8051 --key_file=./keys/staker_private_key.pem
+    entrypoint: ['/usr/src/node/entrypoint.sh']
+    volumes:
+      - ./blockchain:/usr/src/node
+    environment:
+      - USE_DOCKER=True
+      - DOCKER_NODE_CONTAINER_NAMES=node_one,node_two,node_three
+      - DOCKER_NODE_PORTS=8010,8011,8012
+    ports:
+      - 8011:8011
+      - 8051:8051
+    depends_on:
+      - node_one
+    networks:
+      - host
+
+  node_three:
+    build: ./blockchain
+    command: python run_node.py --ip=0.0.0.0 --node_port=8012 --api_port=8052
+    entrypoint: ['/usr/src/node/entrypoint.sh']
+    volumes:
+      - ./blockchain:/usr/src/node
+    environment:
+      - USE_DOCKER=True
+      - DOCKER_NODE_CONTAINER_NAMES=node_one,node_two,node_three
+      - DOCKER_NODE_PORTS=8010,8011,8012
+    ports:
+      - 8012:8012
+      - 8052:8052
+    depends_on:
+      - node_one
+    networks:
+      - host
+      
+networks:
+  host:
