@@ -4,7 +4,7 @@ import time
 
 from blockchain.p2p.message import Message
 from blockchain.utils.helpers import BlockchainUtils
-from blockchain.utils.logger import CustomLogger
+from blockchain.utils.logger import logger
 
 
 class PeerDiscoveryHandler:
@@ -19,19 +19,24 @@ class PeerDiscoveryHandler:
         discovery_thread.start()
 
     def status(self):
-        logger = CustomLogger(
-            level="info", socket_communication=self.socket_communication
-        )
+        count = 1
         while True:
             current_connections = []
             for peer in self.socket_communication.peers:
                 current_connections.append(f"{peer.ip}: {peer.port}")
             if not self.socket_communication.peers:
-                logger.log(message="No nodes connected")
+                logger.info({"message": "No nodes connected"})
             else:
-                logger.log(message=f"Current connections: {current_connections}")
-
-            time.sleep(15)
+                logger.info(
+                    {
+                        "message": "Node connection status",
+                        "connections": f"Current connections: {current_connections}",
+                        "whoami": self.socket_communication,
+                    }
+                )
+            count += 1
+            sleep_time = 15 if count < 10 else 600  # prevent excessive logging
+            time.sleep(sleep_time)
 
     def discovery(self):
         while True:

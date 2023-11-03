@@ -1,37 +1,45 @@
+import json
 import logging
-import sys
+from datetime import datetime
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+from pythonjsonlogger import jsonlogger
 
 
-class CustomLogger:
-    def __init__(self, level, socket_communication=None):
-        global logging
-        self.logging = logging
-        self.level = level
-        self.socket_communication = socket_communication
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        if not log_record.get("timestamp"):
+            # this doesn't use record.created, so it is slightly off
+            now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            log_record["timestamp"] = now
+        if log_record.get("level"):
+            log_record["level"] = log_record["level"].upper()
+        else:
+            log_record["level"] = record.levelname
 
-    def log(self, message):
-        logger = None
-        message = self.construct_base_message(message)
-        if self.level.lower() == "info":
-            if self.socket_communication:
-                message = message | self.construct_node_info(self.socket_communication)
-            logger = self.logging.info(message)
+        # Uvicorn config
+        log_record.pop("color_message", None)  # Remove uvicorn color message
+        if "http" in record.__dict__:
+            log_record["http"] = record.__dict__["http"]
 
-        elif self.level.lower() == "error":
-            if self.socket_communication:
-                message = message | self.construct_node_info(self.socket_communication)
-            logger = self.logging.error(message)
-        return logger
 
-    def construct_base_message(self, message):
-        return {"message": message}
+def json_translate(obj):
+    from blockchain.p2p.socket_communication import SocketCommunication
 
-    def construct_node_info(self, socket_communication):
+    if isinstance(obj, SocketCommunication):
         return {
-            "whoami": {
-                "ip": socket_communication.socket_connector.ip,
-                "port": socket_communication.socket_connector.port,
-            }
+            "ip": obj.socket_connector.ip,
+            "port": obj.socket_connector.port,
         }
+
+
+# logger = logging.getLogger()
+logger = logging.root
+logger.setLevel(logging.INFO)
+logHandler = logging.StreamHandler()
+formatter = CustomJsonFormatter(
+    json_default=json_translate, json_encoder=json.JSONEncoder
+)
+logHandler.setFormatter(formatter)
+logger.addHandler(logHandler)
+logging.getLogger("uvicorn.access").disabled = True

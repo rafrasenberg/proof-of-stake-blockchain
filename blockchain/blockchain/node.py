@@ -7,7 +7,7 @@ from blockchain.p2p.socket_communication import SocketCommunication
 from blockchain.transaction.transaction_pool import TransactionPool
 from blockchain.transaction.wallet import Wallet
 from blockchain.utils.helpers import BlockchainUtils
-from blockchain.utils.logger import CustomLogger
+from blockchain.utils.logger import logger
 
 
 class Node:
@@ -94,12 +94,17 @@ class Node:
             self.blockchain = local_blockchain_copy
 
     def forge(self):
-        logger = CustomLogger(level="info", socket_communication=self.p2p)
         forger = self.blockchain.next_forger()
         if forger == self.wallet.public_key_string():
-            logger.log(message="Next forger chosen")
             block = self.blockchain.create_block(
                 self.transaction_pool.transactions, self.wallet
+            )
+            logger.info(
+                {
+                    "message": "Next forger chosen",
+                    "block": block.block_count,
+                    "whoami": self.p2p,
+                }
             )
             self.transaction_pool.remove_from_pool(self.transaction_pool.transactions)
             message = Message(self.p2p.socket_connector, "BLOCK", block)

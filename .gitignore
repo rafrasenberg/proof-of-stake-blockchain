@@ -22,6 +22,7 @@ docs.zip
 archive.zip
 .python-version
 .vscode
+.env
 
 # vim temporary files
 *~

@@ -10,6 +10,8 @@ services:
       - USE_DOCKER=True
       - DOCKER_NODE_CONTAINER_NAMES=node_one,node_two,node_three
       - DOCKER_NODE_PORTS=8010,8011,8012
+    labels:
+      com.datadoghq.ad.logs: '[{"service": "blockchain_node", "source": "python"}]'
     ports:
       - 8010:8010
       - 8050:8050
@@ -26,6 +28,8 @@ services:
       - USE_DOCKER=True
       - DOCKER_NODE_CONTAINER_NAMES=node_one,node_two,node_three
       - DOCKER_NODE_PORTS=8010,8011,8012
+    labels:
+      com.datadoghq.ad.logs: '[{"service": "blockchain_node", "source": "python"}]'
     ports:
       - 8011:8011
       - 8051:8051
@@ -44,6 +48,8 @@ services:
       - USE_DOCKER=True
       - DOCKER_NODE_CONTAINER_NAMES=node_one,node_two,node_three
       - DOCKER_NODE_PORTS=8010,8011,8012
+    labels:
+      com.datadoghq.ad.logs: '[{"service": "blockchain_node", "source": "python"}]'
     ports:
       - 8012:8012
       - 8052:8052
@@ -52,5 +58,18 @@ services:
     networks:
       - host
       
+  # datadog:
+  #   image: gcr.io/datadoghq/agent:latest
+  #   container_name: datadog-agent
+  #   env_file:
+  #     - ./.env
+  #   attach: false # Disable verbose container logs
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /proc/:/host/proc/:ro
+  #     - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+  #   networks:
+  #     - host
+
 networks:
   host:

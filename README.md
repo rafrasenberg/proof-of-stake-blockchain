@@ -65,6 +65,22 @@ Visit the auto generated docs at the APIs of each that you run. Example: `http:/
 
 The PoS implementation uses a very simple lottery-like mechanism to select a validator from a list of stakers to forge the next block. Validators' chances of being selected are proportional to their stakes, and the offset from a reference hash value is used to determine the winner. The validator with the closest offset is chosen as the forger. This method aims to achieve a form of randomization while still giving validators with larger stakes a higher probability of being selected. 
 
+## Logging
+
+Basic JSON logging has been implemented for the nodes, as well as the API. You'll see the output in the logs when you run docker compose up.
+
+### Datadog integration
+
+In production you'd ideally want something like datadog, to capture your logs. Since our log output is already in JSON format, datadog integration becomes easy. You can test out the log connection locally through docker compose, uncommenting lines 61-72. Then copy the `.env.example`:
+
+```sh
+cp .env.example .env
+```
+
+Now update the `DD_API_KEY` variable, with your API key. 
+
+If you'd run this in production, e.g. AWS ECS, you would do something very similar. Just run the datadog agent as a sidecar and use the same variables as in the `.env.example`, but put them in the task definition. Since the nodes log to `stdout`, the agent will pick it up. Make sure you add the appropriate docker labels to your node container so it gets picked up (`DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL` is set to `False`),
+
 ## Extra
 
 Make sure the containers are running. Running this against node_one will update all nodes since docker makes use of a volume for the project root. 

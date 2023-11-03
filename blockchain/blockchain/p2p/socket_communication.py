@@ -1,10 +1,12 @@
 import json
+import socket
 
 from p2pnetwork.node import Node
 
 from blockchain.p2p.peer_discovery_handler import PeerDiscoveryHandler
 from blockchain.p2p.socket_connector import SocketConnector
 from blockchain.utils.helpers import BlockchainUtils
+from blockchain.utils.logger import logger
 
 
 class SocketCommunication(Node):
@@ -13,6 +15,18 @@ class SocketCommunication(Node):
         self.peers = []
         self.peer_discovery_handler = PeerDiscoveryHandler(self)
         self.socket_connector = SocketConnector(ip, port)
+
+    def init_server(self):
+        logger.info(
+            {
+                "message": f"Node initialisation on port: {self.port}",
+                "node": {"id": self.id, "ip": self.host, "port": self.port},
+            }
+        )
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind((self.host, self.port))
+        self.sock.settimeout(10.0)
+        self.sock.listen(1)
 
     def connect_to_first_node(self):
         port = self.socket_connector.first_node_config()["port"]
