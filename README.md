@@ -10,6 +10,7 @@ Features:
 - Node API with FastAPI, with separation of concern
 - Flexible: use docker or native
 - Unit tests + CI/CD through Github Actions
+- Logging - Datadog integration
 
 This is just a simple test project. Don't use any of it in production. 😅
 
